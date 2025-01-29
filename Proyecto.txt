@@ -1,0 +1,30 @@
+Requerimientos del proyecto
+
+Desarrollar un chatbot que proporcione soporte técnico sobre un tema en particular (se recomienda "facturación electrónica de la DIAN" o su equivalente en otros países) utilizando modelos de lenguaje open-source y tecnologías como Streamlit.
+
+- El chatbot debe centrarse en resolver dudas relacionadas con un tema específico. Ejemplo: facturación electrónica.
+
+- Utilizar modelos como los ofrecidos por Hugging Face (GPT-NeoX, T5, Falcon, etc.) o groq.
+
+- Diseñar un flujo conversacional que contemple respuestas claras y un manejo básico de errores.
+
+- Utilizar Bases de datos vectoriales.
+
+- Crear una pagina que permita:
+-- Interactuar con el ChatBot
+-- Historial de mensajes y conversaciones
+-- Consultar, visualizar e interactuar con la base de datos vectorial
+
+- Entregar un diagrama (puede ser en herramientas como Lucidchart, Canva o draw.io) que explique el proyecto incluyendo:
+-- Interacción usuario-frontend.
+-- Comunicación entre el frontend y el modelo (API o integración directa).
+-- Procesamiento de las respuestas.
+-- Opciones de manejo de errores.
+
+- Documentar del desarrollo, incluyendo:
+-- Configuración inicial del entorno.
+-- Integración del modelo de lenguaje open-source.
+-- Diseño del frontend en Streamlit.
+-- Pruebas y ajustes realizados.
+
+- Reflexiones sobre el aprendizaje obtenido.
