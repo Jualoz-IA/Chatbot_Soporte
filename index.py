@@ -10,5 +10,9 @@ login_page = st.Page("components/login/login.py", title="Login", icon=":material
 
 st.set_page_config(page_title="Chatbot", page_icon=":material/business_messages:")
 
-pg = st.navigation([chat_page, colletions_page, doc_gestion_page, parameters_page, user_gestion_page, login_page])
-pg.run()
+if not st.session_state["HF_TOKEN"]:
+    st.error("⚠️ Debes configurar tu token en la barra lateral antes de usar la aplicación.")
+else:
+    # Navegación
+    pg = st.navigation([chat_page, colletions_page, doc_gestion_page, parameters_page, user_gestion_page, login_page])
+    pg.run()
