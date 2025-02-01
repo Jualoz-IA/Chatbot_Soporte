@@ -11,7 +11,7 @@ st.set_page_config(page_title="Chatbot", page_icon=":material/business_messages:
 
 def check_if_authenticated():
     if "user_id" not in st.session_state:
-        return True # SIEMPRE RETORNA TRUE PORQQUE EL LOGIN NO ESTA IMPLEMENTADO
+        return False # SIEMPRE RETORNA TRUE PORQQUE EL LOGIN NO ESTA IMPLEMENTADO
     return True
 
 def main():
