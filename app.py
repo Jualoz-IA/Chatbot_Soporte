@@ -1,5 +1,5 @@
 import streamlit as st
-
+from config.database.qdrant_RAG_connection import ai_msg
 # Crear páginas
 chat_page = st.Page("components/chat.py", title="ChatBot", icon=":material/smart_toy:")
 colletions_page = st.Page("components/collections.py", title="Collections", icon=":material/smart_toy:")
@@ -17,6 +17,7 @@ def check_if_authenticated():
 def main():
     if not check_if_authenticated():
         # Si no está autenticado, mostramos el formulario de login
+        st.chat_message(ai_msg)
         pg = st.navigation([login_page])
     else:
         # Si está autenticado, mostramos las tareas

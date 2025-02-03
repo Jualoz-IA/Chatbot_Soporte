@@ -17,8 +17,3 @@ messages = [
     ("human", "How does the aerodynamics of the F-35B work? And what are the differences between the different models?")
 ]
 
-
-
-# Generar la respuesta
-ai_msg = llm.invoke(messages)
-print(ai_msg.content)
