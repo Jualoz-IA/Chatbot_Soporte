@@ -1,4 +1,5 @@
 from langchain_groq import ChatGroq
+import streamlit as st
 from dotenv import load_dotenv
 import os
 
@@ -9,11 +10,10 @@ load_dotenv()
 groq_api_key = os.getenv('GROQ_API_KEY')
 
 # Inicializar el modelo de Groq
-llm = ChatGroq(model="gemma2-9b-it", temperature=0.7, api_key=groq_api_key)
 
-# Definir el prompt
-messages = [
-    ("system", "Independientemente del idioma de la pregunta, siempre responde en español. No debes responder en ningún otro idioma."),
-    ("human", "How does the aerodynamics of the F-35B work? And what are the differences between the different models?")
-]
+@st.cache_resource
+def load_model(model_name, temperature, api_key):
+    return ChatGroq(model=model_name, temperature=temperature, api_key=api_key)
+
+llm = load_model("gemma2-9b-it", 0.7, groq_api_key)
 
