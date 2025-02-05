@@ -15,11 +15,7 @@ from config.database.conectionsql import SessionLocal
 from config.database import functionssql
 
 # Configurar logging
-logging.basicConfig(level=logging.DEBUG, 
-                    format='%(asctime)s - %(levelname)s - %(message)s',
-                    handlers=[
-                        logging.StreamHandler(sys.stdout)
-                    ])
+logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s', handlers=[logging.StreamHandler(sys.stdout)])
 logger = logging.getLogger(__name__)
 
 class GoogleOAuthHandler:
@@ -35,18 +31,13 @@ class GoogleOAuthHandler:
         self.authorization_code: Optional[str] = None
 
         # Verificar que las credenciales estén configuradas
-        logger.debug(f"Client ID: {bool(self.CLIENT_ID)}")
-        logger.debug(f"Client Secret: {bool(self.CLIENT_SECRET)}")
-        
         if not self.CLIENT_ID or not self.CLIENT_SECRET:
             st.error("Configuración de Google OAuth incompleta. Revise sus credenciales.")
 
     def generate_pkce_challenge(self):
         """Genera desafío PKCE para mayor seguridad."""
         verifier = base64.urlsafe_b64encode(secrets.token_bytes(32)).decode().replace('=', '')
-        challenge = base64.urlsafe_b64encode(
-            hashlib.sha256(verifier.encode()).digest()
-        ).decode().replace('=', '')
+        challenge = base64.urlsafe_b64encode(hashlib.sha256(verifier.encode()).digest()).decode().replace('=', '')
         return verifier, challenge
 
     def exchange_code_for_token(self, authorization_code):
@@ -54,7 +45,6 @@ class GoogleOAuthHandler:
         # Verificar que el code_verifier exista en la sesión
         code_verifier = st.session_state.get('code_verifier')
         if not code_verifier:
-            logger.error("No se encontró el code verifier")
             raise ValueError("No se encontró el code verifier. Reinicie el proceso de autenticación.")
 
         # Parámetros para el intercambio de token
@@ -69,22 +59,17 @@ class GoogleOAuthHandler:
 
         try:
             # Solicitar token
-            logger.debug("Intentando intercambiar código por token")
             response = requests.post(self.TOKEN_URL, data=token_params)
             
             # Verificar respuesta
-            logger.debug(f"Respuesta del token: {response.status_code}")
             if response.status_code != 200:
-                logger.error(f"Error en la solicitud de token: {response.text}")
                 st.error(f"Error en la solicitud de token: {response.text}")
                 return None
 
             # Parsear respuesta
             tokens = response.json()
-            logger.debug("Tokens obtenidos exitosamente")
             return tokens
         except Exception as e:
-            logger.error(f"Error al intercambiar código: {str(e)}")
             st.error(f"Error al intercambiar código: {str(e)}")
             return None
 
@@ -96,13 +81,11 @@ class GoogleOAuthHandler:
             response = requests.get(self.USER_INFO_URL, headers=headers)
             
             if response.status_code != 200:
-                logger.error(f"Error al obtener información de usuario: {response.text}")
                 st.error(f"Error al obtener información de usuario: {response.text}")
                 return None
 
             return response.json()
         except Exception as e:
-            logger.error(f"Error al obtener información de usuario: {str(e)}")
             st.error(f"Error al obtener información de usuario: {str(e)}")
             return None
 
@@ -110,8 +93,6 @@ class GoogleOAuthHandler:
         """Inicia un servidor local para manejar el callback de Google."""
         class CallbackHandler(http.server.SimpleHTTPRequestHandler):
             def do_GET(self):
-                logger.debug(f"Solicitud recibida: {self.path}")
-                
                 # Extraer código de autorización de la URL
                 try:
                     query_params = parse_qs(self.path.split('?')[1] if '?' in self.path else '')
@@ -119,9 +100,7 @@ class GoogleOAuthHandler:
                     
                     if 'code' in query_params:
                         self.server.authorization_code = query_params['code'][0]
-                        logger.debug(f"Código de autorización recibido: {self.server.authorization_code}")
                     elif 'error' in query_params:
-                        logger.error(f"Error en la autorización: {query_params['error']}")
                         self.server.authorization_code = None
                     
                     # Respuesta al navegador
@@ -130,7 +109,6 @@ class GoogleOAuthHandler:
                     self.end_headers()
                     self.wfile.write(b'<html><body><h1>Authentication Completed!</h1><p>You can close this window.</p></body></html>')
                 except Exception as e:
-                    logger.error(f"Error procesando solicitud: {e}")
                     self.send_response(500)
                     self.end_headers()
         
@@ -144,17 +122,14 @@ class GoogleOAuthHandler:
             httpd = CallbackServer(("", self.REDIRECT_PORT), CallbackHandler)
             
             def run_server():
-                logger.debug("Servidor local iniciado, esperando solicitud...")
                 httpd.handle_request()  # Solo maneja una solicitud
                 self.authorization_code = httpd.authorization_code
-                logger.debug(f"Código de autorización final: {self.authorization_code}")
 
             # Iniciar servidor en un hilo separado
             server_thread = Thread(target=run_server)
             server_thread.start()
             return server_thread
         except Exception as e:
-            logger.error(f"Error iniciando servidor local: {e}")
             st.error(f"No se pudo iniciar el servidor local: {e}")
             return None
 
@@ -180,14 +155,11 @@ class GoogleOAuthHandler:
         
         # Construir URL de autorización
         authorization_url = f"{self.AUTHORIZATION_BASE_URL}?{urlencode(params)}"
-        logger.debug(f"URL de autorización generada: {authorization_url}")
         return authorization_url
 
-def login_with_google():
+def login_with_google(ubiq):
     """Maneja el flujo de inicio de sesión con Google."""
     google_oauth = GoogleOAuthHandler()
-
-    st.subheader("Iniciar sesión con Google")
 
     # Verificación adicional de credenciales
     if not google_oauth.CLIENT_ID or not google_oauth.CLIENT_SECRET:
@@ -195,7 +167,7 @@ def login_with_google():
         return
 
     # Botón para iniciar proceso de autenticación
-    if st.button('Iniciar sesión con Google'):
+    if ubiq.form_submit_button('Iniciar sesión con Google', use_container_width=True, type='primary'):
         try:
             # Generar URL de autorización
             authorization_url = google_oauth.get_authorization_url()
@@ -205,14 +177,10 @@ def login_with_google():
             
             if server_thread:
                 # Abrir URL de autorización en el navegador predeterminado
-                logger.debug("Abriendo URL de autorización en navegador...")
                 webbrowser.open(authorization_url)
                 
                 # Esperar a que el servidor reciba el código de autorización
                 server_thread.join(timeout=300)  # Esperar hasta 5 minutos
-                
-                # Verificar si se recibió código de autorización
-                logger.debug(f"Código de autorización recibido: {google_oauth.authorization_code}")
                 
                 if google_oauth.authorization_code:
                     # Intercambiar código por tokens
@@ -252,39 +220,35 @@ def login_with_google():
                             
                             except Exception as db_error:
                                 st.error(f"Error en base de datos: {str(db_error)}")
-                                logger.error(f"Error en base de datos: {db_error}")
                             finally:
                                 db.close()
                         else:
                             st.error("No se pudo obtener la información del usuario")
-                            logger.error("No se pudo obtener la información del usuario")
                     else:
                         st.error("No se pudo obtener el token de acceso")
-                        logger.error("No se pudo obtener el token de acceso")
                 else:
                     st.error("No se recibió código de autorización. Intente nuevamente.")
-                    logger.error("No se recibió código de autorización")
             else:
                 st.error("No se pudo iniciar el servidor local para la autenticación.")
-                logger.error("Fallo al iniciar servidor local")
         
         except Exception as e:
             st.error(f"Error inesperado en la autenticación: {e}")
-            logger.error(f"Error inesperado: {e}")
 
 def login():
-    option = st.radio("Elige una acción:", ["Crear Cuenta", "Iniciar Sesión", "Iniciar con Google"])
+    container = st.container(border=True)
     
-    if option == "Iniciar con Google":
-        login_with_google()
-    
-    if option == "Crear Cuenta":
+    tab1, tab2 = container.tabs(["Crear Cuenta", "Iniciar Sesión"])
+
+    with tab1:
         st.subheader("Create Account")
-        with st.form(key='Crear Cuenta'):
+        with st.form(key='Crear Cuenta', border=False):
             username_input = st.text_input('Enter UserName')
             email_input = st.text_input('Enter Email')
             password_input = st.text_input('Enter Password', type='password')
-            submit_button = st.form_submit_button('Crear Cuenta')
+            left, right = st.columns(2)
+
+            submit_button = left.form_submit_button('Crear Cuenta', use_container_width=True)
+            login_with_google(right)
 
             if submit_button:
                 # Validar que los campos no estén vacíos
@@ -300,20 +264,24 @@ def login():
                     db = SessionLocal()
                     result = functionssql.create_user(db, username_input, email_input, password_input)
 
-                    if "error" in result:
-                        st.error(result["error"])  # Muestra el mensaje de error
-                    elif "user" in result:
+                    if result["status"] == "error":
+                        st.error(result["message"])  # Muestra el mensaje de error
+                    elif result["status"] == "success":
                         user = result["user"]
-                        st.success(f"Account created for {user.username} with email {user.email}!")
+                        st.success(f"Account created for {username_input} with email {email_input}!")
                     else:
                         st.error("Unexpected error occurred.")
 
-    elif option == "Iniciar Sesión":
+    with tab2:
         st.subheader("Iniciar Sesión")
-        with st.form(key='login'):
+        with st.form(key='login', border=False):
             username_input = st.text_input('Enter UserName')
             password_input = st.text_input('Enter Password', type='password')
-            login_button = st.form_submit_button('Iniciar Sesión')
+            left, right = st.columns(2)
+            
+            login_button = left.form_submit_button('Iniciar Sesión', use_container_width=True)
+            login_with_google(right)
+
 
             if login_button:
                 # Verificar si algún campo está vacío
@@ -329,13 +297,11 @@ def login():
                         st.error("Incorrect password. Please try again.")
                     elif result["status"] == "success":
                         user = result["user"]
-                        st.session_state.user_id = user.id  # Guardar el ID del usuario en la sesión
+                        st.session_state.user_id = user["id"]  # Guardar el ID del usuario en la sesión
                         st.rerun()
                         return True
                     else:
                         st.error("An unexpected error occurred. Please try again.")
-    
-    # Resto de tu lógica de login existente...
     
     return False
 

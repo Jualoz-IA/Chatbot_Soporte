@@ -1,5 +1,5 @@
 import streamlit as st
-from config.database.conectionsql import init_db 
+from config.database.init_bd import init_db 
 from login import login 
 
 # Crear páginas
