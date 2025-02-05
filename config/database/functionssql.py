@@ -1,14 +1,19 @@
+import bcrypt
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 from .modelssql import User
 
 def create_user(db: Session, username: str, email: str, password: str):
     try:
-        db_user = User(username=username, email=email, password=password)
+        # Hashear la contraseña antes de guardarla
+        hashed_password = bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()
+
+        db_user = User(username=username, email=email, password=hashed_password)
         db.add(db_user)
         db.commit()
         db.refresh(db_user)
-        return {"user": db_user}  # Devuelve un diccionario con el usuario creado
+
+        return {"user": db_user}  # Devuelve el usuario creado
     except IntegrityError as e:
         db.rollback()
         if "username" in str(e.orig):
@@ -28,7 +33,9 @@ def verify_user_credentials(db: Session, username: str, password: str):
     user = get_user_by_username(db, username)
     if not user:
         return {"status": "user_not_found"}
-    elif not user.password == password:
-        return {"status": "wrong_password"}
-    else:
+
+    # Comparar la contraseña ingresada con la hasheada
+    if bcrypt.checkpw(password.encode(), user.password.encode()):
         return {"status": "success", "user": user}
+    else:
+        return {"status": "wrong_password"}
