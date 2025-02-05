@@ -3,7 +3,7 @@ from qdrant_client import QdrantClient
 from dotenv import load_dotenv
 from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_qdrant import QdrantVectorStore
-from langchain.document_loaders import PyPDFLoader, TextLoader
+from langchain_community.document_loaders import PyPDFLoader, TextLoader
 from langchain.docstore.document import Document
 from qdrant_client.models import VectorParams
 import os
