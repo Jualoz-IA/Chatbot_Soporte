@@ -1,4 +1,5 @@
 import streamlit as st
+import importlib
 from typing import List
 from config.database.init_bd import init_db
 from config.database.conectionsql import SessionLocal
@@ -31,7 +32,6 @@ def get_user_info(user_id: int):
     finally:
         db.close()
 
-
 def check_if_authenticated():
     """Verifica si el usuario está autenticado y obtiene sus roles"""
     if "user_id" not in st.session_state:
@@ -40,54 +40,49 @@ def check_if_authenticated():
     roles = get_user_roles(st.session_state.user_id)
     return True, roles
 
-def get_authorized_pages(roles: List[str]) -> List[st.Page]:
+def get_authorized_pages(roles: List[str]) -> dict:
     """Retorna las páginas autorizadas según los roles del usuario"""
-    chat_page = st.Page(
-        "components/chat.py",
-        title="ChatBot",
-        icon=":material/smart_toy:"
-    )
-    collections_page = st.Page(
-        "components/collections.py",
-        title="Collections",
-        icon=":material/smart_toy:"
-    )
-    doc_gestion_page = st.Page(
-        "components/doc-gestion.py",
-        title="Documents Gestion",
-        icon=":material/ar_on_you:"
-    )
-    parameters_page = st.Page(
-        "components/parameters.py",
-        title="Models Parameters",
-        icon=":material/multiple_stop:"
-    )
-    user_gestion_page = st.Page(
-        "components/user-gestion.py",
-        title="User Gestion",
-        icon=":material/ar_on_you:"
-    )
-
-    authorized_pages = [chat_page]
+    pages = {"chat": "ChatBot"}
+    
     if "admin" in roles:
-        authorized_pages.extend([
-            collections_page,
-            doc_gestion_page,
-            parameters_page,
-            user_gestion_page
-        ])
+        pages.update({
+            "collections": "Collections",
+            "doc-gestion": "Documents Gestion",
+            "parameters": "Models Parameters",
+            "user-gestion": "User Gestion"
+        })
+    
+    return pages
 
-    return authorized_pages
+def show_page(page_name: str):
+    """Carga dinámicamente el módulo de la página seleccionada"""
+    try:
+        module = importlib.import_module(f"components.{page_name}")
+        module.main()  # Asegúrate de que cada módulo tenga una función main()
+    except ModuleNotFoundError:
+        st.error(f"No se encontró la página: {page_name}")
 
 def init(roles: List[str]):
-    """Inicializa la aplicación con las páginas autorizadas"""
+    """Inicializa la aplicación con la navegación entre páginas"""
     authorized_pages = get_authorized_pages(roles)
-    pg = st.navigation(authorized_pages)
+
+    # Mostrar las opciones de páginas autorizadas en la barra lateral
+    selected_page = st.sidebar.selectbox(
+        "Selecciona una página", 
+        list(authorized_pages.values())
+    )
+    
+    # Obtener la clave correspondiente al nombre de la página seleccionada
+    selected_key = next(k for k, v in authorized_pages.items() if v == selected_page)
+
+    # Mostrar la página seleccionada
+    show_page(selected_key)
+
+    # Cerrar sesión
     with st.sidebar:
         if st.button("🚪 Cerrar Sesión", type="primary", use_container_width=True):
             del st.session_state.user_id
             st.rerun()
-    pg.run()
 
 def main():
     st.set_page_config(
@@ -104,8 +99,6 @@ def main():
             init(roles)
     else:
         init(roles)
-
-    
 
 if __name__ == "__main__":
     main()
