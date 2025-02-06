@@ -13,6 +13,7 @@ import logging
 import sys
 from config.database.conectionsql import SessionLocal
 from config.database import functionssql
+import os
 
 # Configurar logging
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s', handlers=[logging.StreamHandler(sys.stdout)])
@@ -21,8 +22,8 @@ logger = logging.getLogger(__name__)
 class GoogleOAuthHandler:
     def __init__(self):
         # Configuración de OAuth
-        self.CLIENT_ID = st.secrets.get("GOOGLE_CLIENT_ID")
-        self.CLIENT_SECRET = st.secrets.get("GOOGLE_CLIENT_SECRET")
+        self.CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
+        self.CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET")
         self.REDIRECT_PORT = 8505  # Puerto local para manejar callback
         self.REDIRECT_URI = f"http://localhost:{self.REDIRECT_PORT}"
         self.AUTHORIZATION_BASE_URL = "https://accounts.google.com/o/oauth2/v2/auth"
@@ -42,7 +43,6 @@ class GoogleOAuthHandler:
 
     def exchange_code_for_token(self, authorization_code):
         """Intercambia el código de autorización por un token de acceso."""
-        # Verificar que el code_verifier exista en la sesión
         code_verifier = st.session_state.get('code_verifier')
         if not code_verifier:
             raise ValueError("No se encontró el code verifier. Reinicie el proceso de autenticación.")
@@ -203,7 +203,6 @@ def login_with_google(ubiq):
                                 if existing_user:
                                     # Usuario ya existe
                                     st.session_state.user_id = existing_user.id
-                                    st.success(f"Sesión iniciada como {existing_user.username}")
                                 else:
                                     # Crear nuevo usuario
                                     base_username = user_info['name'].lower().replace(' ', '_')
@@ -215,9 +214,12 @@ def login_with_google(ubiq):
                                         counter += 1
                                
                                     result = functionssql.create_user(db, base_username, user_info['email'], None)
+                                    
+                                    if result["status"] == "success":
+                                        user = result["user"]
+                                        st.session_state.user_id = user["id"]  # Guardar el ID del usuario en la sesión
 
                                 st.rerun()
-                            
                             except Exception as db_error:
                                 st.error(f"Error en base de datos: {str(db_error)}")
                             finally:
@@ -236,15 +238,14 @@ def login_with_google(ubiq):
 
 def login():
     container = st.container(border=True)
-    
     tab1, tab2 = container.tabs(["Crear Cuenta", "Iniciar Sesión"])
 
     with tab1:
-        st.subheader("Create Account")
+        st.subheader("Crear cuenta")
         with st.form(key='Crear Cuenta', border=False):
-            username_input = st.text_input('Enter UserName')
-            email_input = st.text_input('Enter Email')
-            password_input = st.text_input('Enter Password', type='password')
+            username_input = st.text_input('UserName')
+            email_input = st.text_input('Email')
+            password_input = st.text_input('Contraseña', type='password')
             left, right = st.columns(2)
 
             submit_button = left.form_submit_button('Crear Cuenta', use_container_width=True)
@@ -253,13 +254,13 @@ def login():
             if submit_button:
                 # Validar que los campos no estén vacíos
                 if not username_input or not email_input or not password_input:
-                    st.error("All fields are required.")
+                    st.error("Todos los campos son requeridos.")
                 # Validar rango de longitud para el username
                 elif len(username_input) < 3 or len(username_input) > 15:
-                    st.error("Username must be between 3 and 15 characters long.")
+                    st.error("El Username requiere entre 3 y 15 caracteres.")
                 # Validar formato del email
                 elif not is_valid_email(email_input):
-                    st.error("Please enter a valid email address.")
+                    st.error("Por favor ingrese un email valido.")
                 else:
                     db = SessionLocal()
                     result = functionssql.create_user(db, username_input, email_input, password_input)
@@ -268,15 +269,16 @@ def login():
                         st.error(result["message"])  # Muestra el mensaje de error
                     elif result["status"] == "success":
                         user = result["user"]
-                        st.success(f"Account created for {username_input} with email {email_input}!")
+                        st.session_state.user_id = user["id"]
+                        st.rerun()
                     else:
                         st.error("Unexpected error occurred.")
 
     with tab2:
         st.subheader("Iniciar Sesión")
         with st.form(key='login', border=False):
-            username_input = st.text_input('Enter UserName')
-            password_input = st.text_input('Enter Password', type='password')
+            username_input = st.text_input('UserName')
+            password_input = st.text_input('Contraseña', type='password')
             left, right = st.columns(2)
             
             login_button = left.form_submit_button('Iniciar Sesión', use_container_width=True)
@@ -286,7 +288,7 @@ def login():
             if login_button:
                 # Verificar si algún campo está vacío
                 if not username_input or not password_input:
-                    st.error("Both username and password are required.")
+                    st.error("Username y contraseña son requeridas.")
                 else:
                     db = SessionLocal()
                     result = functionssql.verify_user_credentials(db, username_input, password_input)
