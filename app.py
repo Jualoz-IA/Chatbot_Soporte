@@ -18,7 +18,6 @@ def check_if_authenticated():
 def main():
     if not check_if_authenticated():
         # Si no está autenticado, mostramos el formulario de login
-        #st.chat_message(ai_msg)
         pg = st.navigation([login_page])
     else:
         # Si está autenticado, mostramos las tareas
