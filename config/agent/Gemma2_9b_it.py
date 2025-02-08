@@ -1,13 +1,11 @@
 from langchain_groq import ChatGroq
 import streamlit as st
-from dotenv import load_dotenv
 import os
 
 # Cargar las variables del archivo .env
-load_dotenv()
 
 # Obtener la clave API
-groq_api_key = os.getenv('GROQ_API_KEY')
+groq_api_key = os.getenv("GROQ_API_KEY")
 
 # Inicializar el modelo de Groq
 
