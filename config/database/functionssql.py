@@ -4,9 +4,10 @@ from .modelssql import User, Role
 from passlib.hash import bcrypt
 from typing import Optional, Dict, Any
 
-def create_user(db: Session, username: str, email: str, password: Optional[str] = None) -> Dict[str, Any]:
+def create_user(db: Session, username: str, email: str, password: Optional[str] = None, role: Optional[str] = None) -> Dict[str, Any]:
     """
-    Crea un nuevo usuario. Soporta tanto creación con contraseña como registro mediante Google
+    Crea un nuevo usuario. Soporta tanto creación con contraseña como registro mediante Google,
+    permitiendo asignar un rol específico.
     """
     try:
         # Si se proporciona contraseña, hashearla
@@ -19,11 +20,16 @@ def create_user(db: Session, username: str, email: str, password: Optional[str] 
             password=hashed_password
         )
         
-        # Asignar rol de usuario por defecto
-        default_role = db.query(Role).filter(Role.name == "user").first()
-        if default_role:
-            db_user.roles.append(default_role)
-        
+        # Asignar el rol seleccionado
+        selected_role = db.query(Role).filter(Role.name == role).first()
+        if selected_role:
+            db_user.roles.append(selected_role)
+        else:
+            # Si el rol no existe, asignar "user" por defecto
+            default_role = db.query(Role).filter(Role.name == "user").first()
+            if default_role:
+                db_user.roles.append(default_role)
+
         db.add(db_user)
         db.commit()
         db.refresh(db_user)
@@ -87,3 +93,11 @@ def get_user_by_email(db: Session, email: str) -> Optional[User]:
     Busca un usuario por su email
     """
     return db.query(User).filter(User.email == email).first()
+
+def get_roles(db: Session):
+    """Obtiene todos los roles disponibles en la base de datos."""
+    try:
+        roles = db.query(Role).all()
+        return [role.name for role in roles]
+    except Exception as e:
+        return {"error": f"Error al obtener roles: {str(e)}"}

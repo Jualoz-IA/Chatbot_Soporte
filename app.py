@@ -3,6 +3,7 @@ from typing import List
 from config.database.init_bd import init_db
 from config.database.conectionsql import SessionLocal
 from config.database.modelssql import User
+from components.user_gestion import user_gestion
 from login import login
 
 def get_user_roles(user_id: int) -> List[str]:
@@ -63,8 +64,8 @@ def get_authorized_pages(roles: List[str]) -> List[st.Page]:
         icon=":material/multiple_stop:"
     )
     user_gestion_page = st.Page(
-        "components/user-gestion.py",
-        title="User Gestion",
+        "components/user_gestion.py", 
+        title="User Management", 
         icon=":material/ar_on_you:"
     )
 
@@ -88,6 +89,8 @@ def init(roles: List[str]):
             del st.session_state.user_id
             st.rerun()
     pg.run()
+    if (pg.title == "User Management"):
+        user_gestion()
 
 def main():
     st.set_page_config(
