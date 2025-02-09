@@ -8,7 +8,7 @@ from qdrant_client.models import VectorParams
 import streamlit as st
 import os
 
-model_name = "distilbert-base-nli-stsb-mean-tokens"
+model_name = os.getenv('EMBEDDINGS_MODEL')
 
 client = QdrantClient(
     url = os.getenv('QDRANT_DATABASE_URL'),
