@@ -3,7 +3,6 @@ import pandas as pd
 from config.database.conectionsql import SessionLocal
 from config.database import user_crud, functionssql
 from login import login
-import matplotlib.pyplot as plt
 import plotly.express as px
 from collections import Counter
 

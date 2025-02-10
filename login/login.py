@@ -303,6 +303,7 @@ def login():
                         st.rerun()
                         return True
                     else:
+                        st.write(result)
                         st.error("An unexpected error occurred. Please try again.")
     
     return False

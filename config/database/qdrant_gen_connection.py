@@ -25,15 +25,13 @@ def create_qdrant_collection(name):
         collection_name = name,
         vectors_config=VectorParams(size=768, distance="Cosine")
     )
-    print(f'Colección "{name}" creada con éxito.')
 
 def pdf_to_document(pdf_path):
-        # --- Procesamiento de un archivo PDF ---
+    # --- Procesamiento de un archivo PDF ---
     pdf_loader = PyPDFLoader(pdf_path)
     return pdf_loader.load()
 
 def txt_to_document(txt_path):
-    
     # --- Procesamiento de un archivo TXT ---
     txt_loader = TextLoader(txt_path)
     return txt_loader.load()
@@ -66,7 +64,6 @@ def dump_txt_pdf_documents_to_qdrant(name, raw_text=None, pdf_docs=None, txt_doc
     
     # Verificar que exista al menos un documento
     if not documents:
-        print("No se proporcionaron documentos ni texto para indexar.")
         return
 
     # Dividir documentos en fragmentos (chunks) para mejorar la calidad de los embeddings
@@ -75,8 +72,6 @@ def dump_txt_pdf_documents_to_qdrant(name, raw_text=None, pdf_docs=None, txt_doc
 
     # Agregar los documentos fragmentados al vector store en Qdrant
     vector_store.add_documents(docs_with_chunks)
-    print(f"Documentos agregados correctamente a la colección '{name}'.")
-
 
     # Agregar los documentos al vector store
     vector_store.add_documents(docs_with_chunks)

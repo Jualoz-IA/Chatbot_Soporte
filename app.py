@@ -1,4 +1,3 @@
-import os
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -11,8 +10,6 @@ from config.database.conectionsql import SessionLocal
 from config.database.modelssql import User
 from components.user_gestion import user_gestion
 from login import login
-
-
 
 def get_user_roles(user_id: int) -> List[str]:
     """Obtiene los roles del usuario desde la base de datos"""
@@ -115,8 +112,6 @@ def main():
             init(roles)
     else:
         init(roles)
-
-    
 
 if __name__ == "__main__":
     main()

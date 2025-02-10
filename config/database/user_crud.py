@@ -1,4 +1,3 @@
-import bcrypt
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 from config.database.modelssql import User, Role

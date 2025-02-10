@@ -43,9 +43,10 @@ def create_default_roles(db):
 
 def create_default_admin(db):
     """Crear usuario administrador por defecto si no existe"""
-    admin_username = "admin"
-    admin_email = "admin@example.com"
-    admin_password = "admin123"
+    import os
+    admin_username = os.getenv('USER')
+    admin_email = os.getenv('EMAIL')
+    admin_password = os.getenv('PASSWORD')
 
     existing_admin = db.query(User).filter(
         (User.username == admin_username) | (User.email == admin_email)
@@ -63,14 +64,6 @@ def create_default_admin(db):
             admin_user.roles.append(admin_role)
 
         db.add(admin_user)
-        print(f"""
-        =====================================
-        Admin user created successfully!
-        Username: {admin_username}
-        Password: {admin_password}
-        Please change these credentials immediately!
-        =====================================
-        """)
 
 def init_db():
     """Inicializar la base de datos con tablas y datos por defecto"""
@@ -81,13 +74,10 @@ def init_db():
             create_default_roles(db)
             create_default_admin(db)
             db.commit()
-            print("Database initialized successfully!")
         except Exception as e:
             db.rollback()
-            print(f"Error during database initialization: {str(e)}")
             raise
         finally:
             db.close()
     except Exception as e:
-        print(f"Error creating database tables: {str(e)}")
         raise
