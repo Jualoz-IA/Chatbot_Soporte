@@ -62,10 +62,10 @@ def get_authorized_pages(roles: List[str]) -> List[st.Page]:
         icon=":material/smart_toy:"
     )
     doc_gestion_page = st.Page(
-        "components/doc-gestion.py",
-        title="Documents Gestion",
-        icon=":material/ar_on_you:"
-    )
+         "components/doc_gestion.py",
+         title="Documents Gestion",
+         icon=":material/ar_on_you:"
+     )
     parameters_page = st.Page(
         "components/parameters.py",
         title="Models Parameters",
