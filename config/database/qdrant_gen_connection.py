@@ -1,23 +1,24 @@
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from qdrant_client import QdrantClient
-from dotenv import load_dotenv
 from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_qdrant import QdrantVectorStore
 from langchain.document_loaders import PyPDFLoader, TextLoader
 from langchain.docstore.document import Document
 from qdrant_client.models import VectorParams
+import streamlit as st
 import os
 
-model_name = "distilbert-base-nli-stsb-mean-tokens"
+model_name = os.getenv('EMBEDDINGS_MODEL')
 
 client = QdrantClient(
     url = os.getenv('QDRANT_DATABASE_URL'),
     api_key=os.getenv('QDRANT_API_KEY')
 )
+@st.cache_resource
+def load_embeddings(model_name):
+    return HuggingFaceEmbeddings(model_name=model_name)
 
-hf = HuggingFaceEmbeddings( 
-    model_name = model_name
-)
+hf = load_embeddings(model_name)
 
 def create_qdrant_collection(name):
     client.recreate_collection(
