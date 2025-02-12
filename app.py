@@ -4,16 +4,15 @@ load_dotenv()
 import streamlit as st
 from typing import List
 
-# Proyect imports
+# Project imports
 from config.database.init_bd import init_db
 from config.database.sql_connection import SessionLocal
 from config.models.models_sql import User
-from components.user_gestion import user_gestion
-from login import login
+from login.login import login_view
 
 def get_user_roles(user_id: int) -> List[str]:
     """Obtiene los roles del usuario desde la base de datos"""
-    db = SessionLocal()
+    db = SessionLocal() 
     try:
         user = db.query(User).filter(User.id == user_id).first()
         if user:
@@ -22,96 +21,83 @@ def get_user_roles(user_id: int) -> List[str]:
     finally:
         db.close()
 
-def get_user_info(user_id: int):
-    """Obtiene la información del usuario desde la base de datos"""
-    db = SessionLocal()
-    try:
-        user = db.query(User).filter(User.id == user_id).first()
-        if user:
-            return {
-                "username": user.username,
-                "email": user.email,
-                "roles": [role.name for role in user.roles]
-            }
-        return None
-    finally:
-        db.close()
-
-
 def check_if_authenticated():
     """Verifica si el usuario está autenticado y obtiene sus roles"""
-    if "user_id" not in st.session_state:
-        return False, []
-    
-    roles = get_user_roles(st.session_state.user_id)
-    return True, roles
+    return "user_id" in st.session_state, get_user_roles(st.session_state.get("user_id", None))
 
 def get_authorized_pages(roles: List[str]) -> List[st.Page]:
     """Retorna las páginas autorizadas según los roles del usuario"""
-    chat_page = st.Page(
-        "components/chat.py",
-        title="ChatBot",
-        icon=":material/smart_toy:"
-    )
-    collections_page = st.Page(
-        "components/collections.py",
-        title="Collections",
-        icon=":material/smart_toy:"
-    )
-    doc_gestion_page = st.Page(
-        "components/doc-gestion.py",
-        title="Documents Gestion",
-        icon=":material/ar_on_you:"
-    )
-    parameters_page = st.Page(
-        "components/parameters.py",
-        title="Models Parameters",
-        icon=":material/multiple_stop:"
-    )
-    user_gestion_page = st.Page(
-        "components/user_gestion.py", 
-        title="User Management", 
-        icon=":material/ar_on_you:"
-    )
-
-    authorized_pages = [chat_page]
+    pages = {
+        "chat": st.Page("components/chat.py", title="ChatBot", icon=":material/smart_toy:"),
+        "collections": st.Page("components/collections.py", title="Collections", icon=":material/smart_toy:"),
+        "doc_gestion": st.Page("components/doc-gestion.py", title="Documents Gestion", icon=":material/ar_on_you:"),
+        "parameters": st.Page("components/parameters.py", title="Models Parameters", icon=":material/multiple_stop:"),
+        "user_gestion": st.Page("components/user_gestion.py", title="User Management", icon=":material/ar_on_you:")
+    }
+    
+    # Por defecto, todos los usuarios autenticados tienen acceso al chat
+    authorized_pages = [pages["chat"]]
+    
+    # Páginas adicionales para administradores
     if "admin" in roles:
         authorized_pages.extend([
-            collections_page,
-            doc_gestion_page,
-            parameters_page,
-            user_gestion_page
+            pages["collections"],
+            pages["doc_gestion"],
+            pages["parameters"],
+            pages["user_gestion"]
         ])
-
+    
     return authorized_pages
 
-def init(roles: List[str]):
-    """Inicializa la aplicación con las páginas autorizadas"""
+def render_authenticated_view(roles: List[str]):
+    """Renderiza la vista para usuarios autenticados"""
     authorized_pages = get_authorized_pages(roles)
+    
     pg = st.navigation(authorized_pages)
-    with st.sidebar:
-        if st.button("🚪 Cerrar Sesión", type="primary", use_container_width=True):
-            del st.session_state.user_id
-            st.rerun()
+    
+    # Botón de cerrar sesión
+    if st.sidebar.button("🚪 Cerrar Sesión", type="primary", use_container_width=True):
+        # Limpiar todos los estados de la sesión
+        for key in list(st.session_state.keys()):
+            del st.session_state[key]
+        st.rerun()
     pg.run()
-    if (pg.title == "User Management"):
-        user_gestion()
+
+
 
 def main():
     st.set_page_config(
         page_title="Chatbot",
         page_icon=":material/business_messages:",
+        initial_sidebar_state="collapsed"
     )
+
+    # Ocultar el menú
+    hide_streamlit_style = """
+        <style>
+            #MainMenu {visibility: hidden;}
+            footer {visibility: hidden;}
+            [data-testid="collapsedControl"] {visibility: hidden;}
+        </style>
+    """
+    st.markdown(hide_streamlit_style, unsafe_allow_html=True)
 
     init_db()
     is_authenticated, roles = check_if_authenticated()
 
     if not is_authenticated:
-        if login.login():
-            _, roles = check_if_authenticated()
-            init(roles)
+        # Si no está autenticado, mostrar solo el login
+        st.markdown(
+            """
+            <style>
+                section[data-testid="stSidebar"] {display: none !important;}
+            </style>
+            """,
+            unsafe_allow_html=True
+        )
+        login_view()
     else:
-        init(roles)
+        render_authenticated_view(roles)
 
 if __name__ == "__main__":
     main()
