@@ -6,16 +6,14 @@ from langchain_qdrant import QdrantVectorStore
 from config.database.qdrant_gen_connection import client, hf
 from langchain_core.messages import HumanMessage, AIMessage
 # RAG (Retrieval-Augmented Generation)
+import streamlit as st
 
-collection_name = "text"
-client.recreate_collection(
-    collection_name=collection_name,
-    vectors_config=VectorParams(size=768, distance="Cosine")
-)
+
+collection_name = "PRUEBA 2"
 
 vector_store = QdrantVectorStore(
     client=client,
-    collection_name="text",
+    collection_name=collection_name,
     embedding=hf,
     )
 
@@ -32,6 +30,7 @@ chain = ConversationalRetrievalChain.from_llm(
     return_source_documents=True,  # Devuelve los documentos fuente usados en la respuesta.
     verbose=True  # Activa la depuración para ver detalles de los pasos internos.
 )
+
 ## ejemplo de entrada
 ## chat_history = [
 #     {"role": "user", "content": "Hola, ¿cómo estás?"},
@@ -39,19 +38,28 @@ chain = ConversationalRetrievalChain.from_llm(
 #     {"role": "user", "content": "Quiero saber sobre Python."}
 # ]
 def invoke(question, chat_history):
+    # Debug logging
+    st.write("Pregunta recibida:", question)
+    
     chat_history_parsed = [
         HumanMessage(content=msg['content']) if msg['role'] == 'user' else
         AIMessage(content=msg['content'])
-        for msg in chat_history
+        for msg in chat_history[:-1]  # Excluimos la última pregunta para evitar repetición
     ]
-
-#chain.combine_docs_chain
-    return chain.invoke({"question": question, "chat_history":chat_history_parsed})
+    
+    # Debug del contexto recuperado
+    response = chain.invoke({
+        "question": question, 
+        "chat_history": chat_history_parsed
+    })
+    
+    st.write("Documentos recuperados:", [doc.page_content for doc in response['source_documents']])
+    
+    return response
 
 ## ejemplo de salida
 # [
 #     HumanMessage(content="Hola, ¿cómo estás?"),
 #     AIMessage(content="Estoy bien, gracias. ¿Cómo puedo ayudarte?"),
-#     HumanMessage(content="Quiero saber sobre Python.")
-# ]
-
+#     HumanMessage(content="Quiero saber sobre Python.")
+# ]
