@@ -1,5 +1,5 @@
-from .conectionsql import Base, engine, SessionLocal  # o from .conectionsql import Base, engine, SessionLocal
-from .modelssql import User, Role, Permission
+from .sql_connection import Base, engine, SessionLocal  # o from .conectionsql import Base, engine, SessionLocal
+from ..models.models_sql import User, Role, Permission
 from passlib.hash import bcrypt
 
 def create_default_roles(db):

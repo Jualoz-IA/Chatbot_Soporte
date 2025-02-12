@@ -1,6 +1,8 @@
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
-from .modelssql import User, Role
+
+from config.models.models_params import ModelParams
+from ...models.models_sql import User, Role
 from passlib.hash import bcrypt
 from typing import Optional, Dict, Any
 

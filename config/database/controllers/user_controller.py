@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
-from config.database.modelssql import User, Role
+from config.models.models_sql import User, Role
 
 # **Obtener todos los usuarios**
 def get_users(db: Session):

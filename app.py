@@ -6,8 +6,8 @@ from typing import List
 
 # Proyect imports
 from config.database.init_bd import init_db
-from config.database.conectionsql import SessionLocal
-from config.database.modelssql import User
+from config.database.sql_connection import SessionLocal
+from config.models.models_sql import User
 from components.user_gestion import user_gestion
 from login import login
 

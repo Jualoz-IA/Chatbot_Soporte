@@ -28,4 +28,5 @@ if prompt:
         st.markdown(response["answer"])
         #response['source_documents']
     # Agregar respuesta del modelo al historial
+
     st.session_state.messages.append({"role": "assistant", "content": response["answer"]})

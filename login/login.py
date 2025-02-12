@@ -11,8 +11,8 @@ from threading import Thread
 from typing import Optional
 import logging
 import sys
-from config.database.conectionsql import SessionLocal
-from config.database import functionssql
+from config.database.sql_connection import SessionLocal
+from config.database.controllers import login_controller
 import os
 
 # Configurar logging
@@ -192,8 +192,8 @@ def login_with_google(ubiq):
                         
                         if user_info:
                             # Crear o iniciar sesión con usuario
-                            from config.database.conectionsql import SessionLocal
-                            from config.database.modelssql import User
+                            from config.database.sql_connection import SessionLocal
+                            from config.models.models_sql import User
                             
                             db = SessionLocal()
                             try:
@@ -213,7 +213,7 @@ def login_with_google(ubiq):
                                         base_username = f"{base_username}_{counter}"
                                         counter += 1
                                
-                                    result = functionssql.create_user(db, base_username, user_info['email'], None)
+                                    result = login_controller.create_user(db, base_username, user_info['email'], None)
                                     
                                     if result["status"] == "success":
                                         user = result["user"]
@@ -263,7 +263,7 @@ def login():
                     st.error("Por favor ingrese un email valido.")
                 else:
                     db = SessionLocal()
-                    result = functionssql.create_user(db, username_input, email_input, password_input)
+                    result = login_controller.create_user(db, username_input, email_input, password_input)
 
                     if result["status"] == "error":
                         st.error(result["message"])  # Muestra el mensaje de error
@@ -291,7 +291,7 @@ def login():
                     st.error("Username y contraseña son requeridas.")
                 else:
                     db = SessionLocal()
-                    result = functionssql.verify_user_credentials(db, username_input, password_input)
+                    result = login_controller.verify_user_credentials(db, username_input, password_input)
 
                     if result["status"] == "user_not_found":
                         st.error(f"The username '{username_input}' does not exist.")

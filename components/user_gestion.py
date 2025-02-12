@@ -1,7 +1,8 @@
 import streamlit as st
 import pandas as pd
-from config.database.conectionsql import SessionLocal
-from config.database import user_crud, functionssql
+from config.database.controllers import user_controller
+from config.database.sql_connection import SessionLocal
+from config.database.controllers import login_controller
 from login import login
 import plotly.express as px
 from collections import Counter
@@ -11,7 +12,7 @@ def user_gestion():
     db = SessionLocal()
 
     # Obtener los roles desde la base de datos
-    roles = functionssql.get_roles(db)
+    roles = login_controller.get_roles(db)
     if isinstance(roles, dict) and "error" in roles:
         st.error(roles["error"])
         roles = []  # Evitar errores si la consulta falla
@@ -22,7 +23,7 @@ def user_gestion():
         # Ajustamos el tamaño de las columnas (70% para la tabla, 30% para la gráfica)
         col1, col2 = st.columns([0.7, 0.3])  
 
-        users = user_crud.get_users(db)  # Obtener usuarios solo una vez
+        users = user_controller.get_users(db)  # Obtener usuarios solo una vez
 
         if isinstance(users, dict) and "error" in users:
             st.error(users["error"])
@@ -70,7 +71,7 @@ def user_gestion():
                 elif not login.is_valid_email(email_input):
                     st.error("Please enter a valid email address.")
                 else:
-                    result = functionssql.create_user(db, username_input, email_input, password_input, role_input)
+                    result = login_controller.create_user(db, username_input, email_input, password_input, role_input)
                     if "error" in result:
                         st.error(result["error"])
                     elif "user" in result:
@@ -91,7 +92,7 @@ def user_gestion():
             new_role = st.selectbox("Selecciona un nuevo rol", roles)
         
         if st.button("Actualizar Usuario"):
-            result = user_crud.update_user(db, user_id, new_username, new_email, new_role)
+            result = user_controller.update_user(db, user_id, new_username, new_email, new_role)
             if "success" in result:
                 st.success(result["success"])
                 st.rerun()
@@ -102,7 +103,7 @@ def user_gestion():
         st.subheader("🗑️ Eliminar Usuario")
         user_id_to_delete = st.number_input("ID del Usuario a Eliminar", min_value=1, step=1)
         if st.button("Eliminar Usuario"):
-            result = user_crud.delete_user(db, user_id_to_delete)
+            result = user_controller.delete_user(db, user_id_to_delete)
             if "success" in result:
                 st.success(result["success"])
                 st.rerun()
