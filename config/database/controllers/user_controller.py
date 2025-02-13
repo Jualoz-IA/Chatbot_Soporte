@@ -9,6 +9,13 @@ def get_users(db: Session):
     except Exception as e:
         return {"error": f"Error al obtener usuarios: {str(e)}"}
 
+def get_users_name_id(db: Session):
+    try:
+        users = db.query(User.id, User.username).all()
+        return [{"id": user.id, "username": user.username} for user in users]
+    except Exception as e:
+        return {"error": f"Error al obtener usuarios: {str(e)}"}
+
 # **Actualizar Usuario**
 def update_user(db: Session, user_id: int, username: str = None, email: str = None, role_name: str = None):
     user = db.query(User).filter(User.id == user_id).first()

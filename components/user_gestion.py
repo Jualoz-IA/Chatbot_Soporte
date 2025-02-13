@@ -7,8 +7,10 @@ from login import login
 import plotly.express as px
 from collections import Counter
 
+__name__ = '__user_gestion__'
+
 def user_gestion():
-    st.title("-- Gestión de Usuarios --")
+    st.title("Gestión de Usuarios")
     db = SessionLocal()
 
     # Obtener los roles desde la base de datos
@@ -84,7 +86,19 @@ def user_gestion():
         col1, col2 = st.columns(2)  # Divide en dos columnas
 
         with col1:
-            user_id = st.number_input("ID del Usuario", min_value=1, step=1)
+            users = user_controller.get_users_name_id(db)
+            
+            username_to_id = dict(sorted(
+                {user["username"]: user["id"] for user in users}.items()
+            ))
+            
+            selected_username = st.selectbox(
+                "Seleccionar Usuario",
+                options=username_to_id.keys(),
+                key="user_select"
+            )
+            
+            user_id = username_to_id[selected_username]
             new_username = st.text_input("Nuevo Nombre de Usuario")
 
         with col2:
@@ -101,8 +115,19 @@ def user_gestion():
 
     with eliminar:
         st.subheader("🗑️ Eliminar Usuario")
-        user_id_to_delete = st.number_input("ID del Usuario a Eliminar", min_value=1, step=1)
-        if st.button("Eliminar Usuario"):
+        
+        users = user_controller.get_users_name_id(db)
+        username_to_id = {user["username"]: user["id"] for user in users}
+        
+        selected_username = st.selectbox(
+            "Seleccionar Usuario a Eliminar",
+            options=username_to_id.keys(),
+            key="delete_user_select"
+        )
+        
+        user_id_to_delete = username_to_id[selected_username]
+        
+        if st.button("Eliminar Usuario", type="primary"):
             result = user_controller.delete_user(db, user_id_to_delete)
             if "success" in result:
                 st.success(result["success"])
@@ -112,5 +137,5 @@ def user_gestion():
 
     db.close()
 
-if __name__ == "__main__":
+if __name__ == "__user_gestion__":
     user_gestion()

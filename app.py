@@ -30,7 +30,7 @@ def get_authorized_pages(roles: List[str]) -> List[st.Page]:
     pages = {
         "chat": st.Page("components/chat.py", title="ChatBot", icon=":material/smart_toy:"),
         "collections": st.Page("components/collections.py", title="Collections", icon=":material/smart_toy:"),
-        "doc_gestion": st.Page("components/doc-gestion.py", title="Documents Gestion", icon=":material/ar_on_you:"),
+        "doc_gestion": st.Page("components/doc_gestion.py", title="Documents Gestion", icon=":material/ar_on_you:"),
         "parameters": st.Page("components/parameters.py", title="Models Parameters", icon=":material/multiple_stop:"),
         "user_gestion": st.Page("components/user_gestion.py", title="User Management", icon=":material/ar_on_you:")
     }

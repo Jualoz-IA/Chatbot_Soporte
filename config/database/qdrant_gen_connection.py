@@ -20,12 +20,6 @@ def load_embeddings(model_name):
 
 hf = load_embeddings(model_name)
 
-def create_qdrant_collection(name):
-    client.recreate_collection(
-        collection_name = name,
-        vectors_config=VectorParams(size=768, distance="Cosine")
-    )
-
 def pdf_to_document(pdf_path):
     # --- Procesamiento de un archivo PDF ---
     pdf_loader = PyPDFLoader(pdf_path)

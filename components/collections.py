@@ -1,33 +1,13 @@
 import streamlit as st
-from qdrant_client import QdrantClient
-import os
+from config.database.controllers import qdrant_controller
 
 __name__ = '__collections__'
-
-# Conexión con Qdrant
-client = QdrantClient(
-    url=os.getenv("QDRANT_DATABASE_URL"),
-    api_key=os.getenv("QDRANT_API_KEY")
-)
-
-# Función para obtener colecciones en tabla
-def table_collections():
-    collections = client.get_collections()
-    table = []
-    for collection in collections.collections:
-        c = client.get_collection(collection.name)
-        table.append({
-            "Nombre": collection.name,
-            "Tamaño": c.config.params.vectors.size,
-            "Métrica": c.config.params.vectors.distance
-        })
-    return table
 
 # Función para eliminar colección
 def delete_collection(collection_name):
     try:
-        client.delete_collection(collection_name)
-        st.success(f"Colección '{collection_name}' eliminada exitosamente.")
+        qdrant_controller.delete_collection(collection_name)
+        st.rerun()
     except Exception as e:
         st.error(f"Error al eliminar la colección: {e}")
 
@@ -54,11 +34,8 @@ def collection_modal(edit_mode=None):
         if st.button(action):
             try:
                 if action == "Actualizar":
-                    client.delete_collection(collection_name)
-                client.recreate_collection(
-                    collection_name=collection_name,
-                    vectors_config={"size": vector_size, "distance": distance}
-                )
+                    qdrant_controller.delete_collection(collection_name)
+                qdrant_controller.recreate(collection_name, vector_size, distance)
                 st.success(f"Colección '{collection_name}' {action.lower()}ada exitosamente.")
                 st.session_state["modal_open"] = False
                 st.rerun()
@@ -67,7 +44,7 @@ def collection_modal(edit_mode=None):
 
 # Mostrar la tabla con acciones
 def display_table_with_actions():
-    collections = table_collections()
+    collections = qdrant_controller.table_collections()
 
     if collections:
         for idx, collection in enumerate(collections):
