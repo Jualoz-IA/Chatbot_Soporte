@@ -1,65 +1,68 @@
-from qdrant_client.http.models import  Distance, VectorParams
+from qdrant_client.http.models import Distance, VectorParams
 from langchain.chains.conversational_retrieval.base import ConversationalRetrievalChain
 from config.agent.Gemma2_9b_it import llm
 from config.agent.prompts import condense_question_prompt, qa_prompt
 from langchain_qdrant import QdrantVectorStore
 from config.database.qdrant_gen_connection import client, hf
 from langchain_core.messages import HumanMessage, AIMessage
-# RAG (Retrieval-Augmented Generation)
 import streamlit as st
 
+class RAGAgent:
+    def __init__(self):
+        self.vector_stores = {}
+        self.chains = {}
 
-collection_name = "PRUEBA 2"
+    def get_chain(self, collection_name):
+        if collection_name in self.chains:
+            return self.chains[collection_name]
 
-vector_store = QdrantVectorStore(
-    client=client,
-    collection_name=collection_name,
-    embedding=hf,
-    )
+        vector_store = QdrantVectorStore(
+            client=client,
+            collection_name=collection_name,
+            embedding=hf,
+        )
 
-# Convierte vector_store en un retriever (un sistema que busca los documentos más relevantes).
-# search_kwargs={"k": 5}: Define que devuelve los 5 documentos más similares al input del usuario.
-retriever = vector_store.as_retriever(search_kwargs={"k": 5})
+        retriever = vector_store.as_retriever(search_kwargs={"k": 5})
 
-# Crea una cadena de recuperación conversacional con:
-chain = ConversationalRetrievalChain.from_llm(
-    llm=llm,  # El modelo de lenguaje (GPT u otro).
-    retriever=retriever,  # El recuperador de información.
-    condense_question_prompt=condense_question_prompt,  # Un prompt para reformular la pregunta en un formato más claro.
-    combine_docs_chain_kwargs={"prompt": qa_prompt},  # Usa qa_prompt para combinar la respuesta a partir de los documentos encontrados.
-    return_source_documents=True,  # Devuelve los documentos fuente usados en la respuesta.
-    verbose=True  # Activa la depuración para ver detalles de los pasos internos.
-)
+        chain = ConversationalRetrievalChain.from_llm(
+            llm=llm,
+            retriever=retriever,
+            condense_question_prompt=condense_question_prompt,
+            combine_docs_chain_kwargs={"prompt": qa_prompt},
+            return_source_documents=True,
+            verbose=True
+        )
 
-## ejemplo de entrada
-## chat_history = [
-#     {"role": "user", "content": "Hola, ¿cómo estás?"},
-#     {"role": "assistant", "content": "Estoy bien, gracias. ¿Cómo puedo ayudarte?"},
-#     {"role": "user", "content": "Quiero saber sobre Python."}
-# ]
-def invoke(question, chat_history):
-    # Debug logging
-    st.write("Pregunta recibida:", question)
-    
-    chat_history_parsed = [
-        HumanMessage(content=msg['content']) if msg['role'] == 'user' else
-        AIMessage(content=msg['content'])
-        for msg in chat_history[:-1]  # Excluimos la última pregunta para evitar repetición
-    ]
-    
-    # Debug del contexto recuperado
-    response = chain.invoke({
-        "question": question, 
-        "chat_history": chat_history_parsed
-    })
-    
-    st.write("Documentos recuperados:", [doc.page_content for doc in response['source_documents']])
-    
-    return response
+        self.chains[collection_name] = chain
+        return chain
 
-## ejemplo de salida
-# [
-#     HumanMessage(content="Hola, ¿cómo estás?"),
-#     AIMessage(content="Estoy bien, gracias. ¿Cómo puedo ayudarte?"),
-#     HumanMessage(content="Quiero saber sobre Python.")
-# ]
+    def invoke(self, question, chat_history, collection="PRUEBA 2"):
+        # Asegurar que la pregunta está en UTF-8
+        question = question.encode("utf-8", "ignore").decode("utf-8")
+
+        # Debug logging
+        st.write(f"Pregunta recibida para colección {collection}:", question)
+
+        # Parsear el historial del chat asegurando UTF-8
+        chat_history_parsed = [
+            HumanMessage(content=msg['content'].encode("utf-8", "ignore").decode("utf-8"))
+            if msg['role'] == 'user' else
+            AIMessage(content=msg['content'].encode("utf-8", "ignore").decode("utf-8"))
+            for msg in chat_history[:-1]
+        ]
+
+        chain = self.get_chain(collection)
+
+        # Obtener respuesta
+        response = chain.invoke({
+            "question": question,
+            "chat_history": chat_history_parsed
+        })
+
+        # Debug de documentos recuperados
+        st.write("Documentos recuperados:", [doc.page_content for doc in response['source_documents']])
+
+        return response
+
+# Crear una instancia global del agente
+rag_agent = RAGAgent()
