@@ -27,8 +27,10 @@ if not st.session_state.messages:
         # Muestra los botones de opciones
         for option in OPTIONS:
             if st.button(option, key=option, use_container_width=True):
+                
                 collection_name = COLLECTIONS_MAP[option]
                 
+                st.collection_name = collection_name
                 # Agrega el mensaje del asistente al historial
                 st.session_state.messages.append({
                     "role": "assistant",
@@ -41,10 +43,6 @@ if not st.session_state.messages:
                 })
                 # Obtiene la respuesta usando la colección correcta
                 response = rag_agent.invoke(question=option, chat_history=st.session_state.messages, collection=collection_name)
-
-# Depuración: Ver qué está devolviendo antes de usar markdown
-                print(response["answer"])  # Verifica si hay caracteres problemáticos
-                st.chat_message("assistant").markdown(response["answer"])
 
                 # Agrega la respuesta del asistente
                 st.session_state.messages.append({
@@ -72,9 +70,7 @@ if st.session_state.messages:
             "content": prompt
         })
 
-        response = rag_agent.invoke(question=prompt, chat_history=st.session_state.messages, collection=default_collection)
-        print(response["answer"])  # Verifica si hay caracteres problemáticos
-        st.chat_message("assistant").markdown(response["answer"])
+        response = rag_agent.invoke(question=prompt, chat_history=st.session_state.messages, collection=st.collection_name)
         with st.chat_message("assistant"):
             st.markdown(response["answer"])
         

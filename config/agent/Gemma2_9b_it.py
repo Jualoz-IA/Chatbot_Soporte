@@ -26,14 +26,12 @@ def load_model(model_name, temperature, api_key, max_tokens=100, top_p=1.0, freq
 llm = load_model(
     model_name="gemma2-9b-it",  # Nombre del modelo a cargar.
     temperature=0.7,  # Controla la aleatoriedad de las respuestas. Valores más bajos hacen que las respuestas sean más deterministas.
-    api_key="tu_api_key_aquí",  # La clave de API necesaria para acceder al modelo.
+    api_key=groq_api_key,  # La clave de API necesaria para acceder al modelo.
     max_tokens=150,  # Número máximo de tokens en la respuesta generada.
     top_p=0.9,  # Controla la probabilidad acumulada para la selección de tokens.
     frequency_penalty=0.5,  # Penalización para la repetición de tokens.
     presence_penalty=0.3,  # Penalización para la aparición de nuevos tokens.
 )
-
-
 
 import requests
 import os
@@ -46,4 +44,3 @@ def get_models(api_key = groq_api_key):
     }
     response = requests.get(url, headers=headers)
     return response.json()
-
