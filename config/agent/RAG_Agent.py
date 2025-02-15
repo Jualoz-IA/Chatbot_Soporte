@@ -1,6 +1,6 @@
 from qdrant_client.http.models import Distance, VectorParams
 from langchain.chains.conversational_retrieval.base import ConversationalRetrievalChain
-from config.agent.Gemma2_9b_it import llm
+from config.agent.IA_model import llm
 from config.agent.prompts import condense_question_prompt, qa_prompt
 from langchain_qdrant import QdrantVectorStore
 from config.database.qdrant_gen_connection import client, hf

@@ -5,13 +5,13 @@ st.title('Chatbot')
 
 # Mapeo de opciones a colecciones
 COLLECTIONS_MAP = {
-    "Debo hacer facturacion electronica": "Prueba de Fuego",
-    "Que documentos necesito": "model",
-    "Que requisitos tiene la facturacion electronica": "PRUEBA 2",
-    "Cuales son los plazos de la facturacion electronica": "models",
-    "Que beneficios tiene la facturacion electronica": "Task",
-    "Penalidades y Sanciones": "newone",
-    "Otro...": "resultscsv"
+    "Debo hacer facturacion electronica": "obligated_collection",
+    "Que documentos necesito": "documents_collection",
+    "Que requisitos tiene la facturacion electronica": "requirements_collection",
+    "Cuales son los plazos de la facturacion electronica": "ranges_collection",
+    "Que beneficios tiene la facturacion electronica": "benefits_collection",
+    "Penalidades y Sanciones": "sanction_collection",
+    "Otro...": "all_collection"
 }
 
 OPTIONS = list(COLLECTIONS_MAP.keys())

@@ -63,8 +63,6 @@ def render_authenticated_view(roles: List[str]):
         st.rerun()
     pg.run()
 
-
-
 def main():
     st.set_page_config(
         page_title="Chatbot",

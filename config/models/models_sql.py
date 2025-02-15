@@ -57,3 +57,10 @@ class User(Base):
                 if permission.resource == resource and permission.action == action:
                     return True
         return False
+    
+class Parametro(Base):
+    __tablename__ = "parametros"
+    
+    clave = Column(String, primary_key=True)
+    valor = Column(String)
+    tipo = Column(String)
