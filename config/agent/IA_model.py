@@ -34,3 +34,15 @@ def load_model():
 
 # Inicializar el modelo LLM con los parámetros cargados
 llm = load_model()
+
+import requests
+import os
+
+def get_models(api_key = groq_api_key):
+    url = "https://api.groq.com/openai/v1/models"
+    headers = {
+        "Authorization": f"Bearer {api_key}",
+        "Content-Type": "application/json"
+    }
+    response = requests.get(url, headers=headers)
+    return response.json()
