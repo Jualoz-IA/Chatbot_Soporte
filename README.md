@@ -4,45 +4,45 @@ Este proyecto es un chatbot de soporte desarrollado con Streamlit y varias integ
 
 ## Estructura del proyecto
 
-    ```
-    CHATBOT_SOPORTE/
-    ├── assets/
-    │   ├── chat.drawio
-    │   ├── Diagram.drawio
-    │   ├── InitialDesign.drawio
-    │   ├── ProyectRequeriments.txt
-    │   └── roles.drawio
-    ├── components/
-    │   ├── chat.py
-    │   ├── collectios.py
-    │   ├── doc_gestion.py
-    │   ├── options.py
-    │   ├── parameters.py
-    │   └── user_gestion.py
-    ├── config/
-    │   ├── agent/
-    │   │   ├── IA_model.py
-    │   │   ├── prompts.py
-    │   │   └── RAG_Agent.py
-    │   ├── database/
-    │   │   ├── controllers/
-    │   │   │   ├── collection_controller.py
-    │   │   │   ├── login_controller.py
-    │   │   │   ├── parametros_controller.py
-    │   │   │   ├── qdrant_controller.py
-    │   │   │   └── user_controller.py
-    │   │   ├── init_bd.py
-    │   │   ├── qdrant_gen_connection.py
-    │   │   └── sql_connection.py
-    │   └── models/
-    │       ├── google_auth.py
-    │       └── models_sql.py
-    ├── login/
-    │   └── login.py
-    ├── .env
-    ├── app.py
-    └── requirements.txt
-    ```
+   ```bash
+   CHATBOT_SOPORTE/
+   ├── assets/
+   │   ├── chat.drawio
+   │   ├── Diagram.drawio
+   │   ├── InitialDesign.drawio
+   │   ├── ProyectRequeriments.txt
+   │   └── roles.drawio
+   ├── components/
+   │   ├── chat.py
+   │   ├── collectios.py
+   │   ├── doc_gestion.py
+   │   ├── options.py
+   │   ├── parameters.py
+   │   └── user_gestion.py
+   ├── config/
+   │   ├── agent/
+   │   │   ├── IA_model.py
+   │   │   ├── prompts.py
+   │   │   └── RAG_Agent.py
+   │   ├── database/
+   │   │   ├── controllers/
+   │   │   │   ├── collection_controller.py
+   │   │   │   ├── login_controller.py
+   │   │   │   ├── parametros_controller.py
+   │   │   │   ├── qdrant_controller.py
+   │   │   │   └── user_controller.py
+   │   │   ├── init_bd.py
+   │   │   ├── qdrant_gen_connection.py
+   │   │   └── sql_connection.py
+   │   └── models/
+   │       ├── google_auth.py
+   │       └── models_sql.py
+   ├── login/
+   │   └── login.py
+   ├── .env
+   ├── app.py
+   └── requirements.txt
+   ```
 
 ## Componentes principales
 
@@ -132,36 +132,40 @@ Necesitarás configurar las siguientes variables de entorno en un archivo .env:
 
 Sigue estos pasos para configurar el entorno y ejecutar la aplicación:
 
-1. Clona el repositorio: Clona el repositorio desde
+### **1. Clona el repositorio: Clona el repositorio desde**
 
-    ```bash
-    git clone https://github.com/Jualoz-IA/Chatbot_Soporte.git
-    cd Chatbot_Soporte
-    ```
+   ```bash
+   git clone https://github.com/Jualoz-IA/Chatbot_Soporte.git
+   cd Chatbot_Soporte
+   ```
 
-2. Crear y activar un entorno virtual
+### **2. Crear y activar un entorno virtual**
 
-    ```bash
-    python -m venv venv
-    source venv/bin/activate  # En macOS y Linux
-    venv\Scripts\activate  # En Windows
-    ```
+   ```bash
+   python -m venv venv
+   source venv/bin/activate  # En macOS y Linux
+   venv\Scripts\activate  # En Windows
+   ```
 
-3. Instalar dependencias
+### **3. Instalar dependencias**
 
-    ```bash
-    pip install -r requirements.txt
-    ```
+   ```bash
+   pip install -r requirements.txt
+   ```
 
-4. Configurar la base de datos PostgreSQL: Crea una base de datos en PostgreSQL y agrega las credenciales en el archivo .env.
+### **4. Configurar la base de datos PostgreSQL:**
 
-    ```bash
-    psql -U tu_usuario -d postgres -c "CREATE DATABASE chatbot_db;"
-    ```
+Crea una base de datos en PostgreSQL y agrega las credenciales en el archivo .env.
 
-5. Configurar las variables de entorno: Crea un archivo .env en la raíz del proyecto con la siguiente estructura.
+   ```bash
+   psql -U tu_usuario -d postgres -c "CREATE DATABASE chatbot_db;"
+   ```
 
-    ```bash
+### **5. Configurar las variables de entorno:**
+
+Crea un archivo .env en la raíz del proyecto con la siguiente estructura.
+
+   ```bash
 	GOOGLE_CLIENT_ID=TU_GOOGLE_CLIENT_ID
 	GOOGLE_CLIENT_SECRET=TU_GOOGLE_CLIENT_SECRET
 	GROQ_API_KEY=TU_GROQ_API_KEY
@@ -172,10 +176,10 @@ Sigue estos pasos para configurar el entorno y ejecutar la aplicación:
 	USER=admin
 	EMAIL=admin@example.com
 	PASSWORD=admin123
-    ```
+   ```
 
-6. Ejecutar la aplicación
+### **6. Ejecutar la aplicación**
 
-    ```bash
+   ```bash
     streamlit run app.py
-    ```
+   ```
