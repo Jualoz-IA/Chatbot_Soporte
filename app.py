@@ -32,7 +32,8 @@ def get_authorized_pages(roles: List[str]) -> List[st.Page]:
         "collections": st.Page("components/collections.py", title="Collections", icon=":material/smart_toy:"),
         "doc_gestion": st.Page("components/doc_gestion.py", title="Documents Gestion", icon=":material/ar_on_you:"),
         "parameters": st.Page("components/parameters.py", title="Models Parameters", icon=":material/multiple_stop:"),
-        "user_gestion": st.Page("components/user_gestion.py", title="User Management", icon=":material/ar_on_you:")
+        "user_gestion": st.Page("components/user_gestion.py", title="User Management", icon=":material/ar_on_you:"),
+        "options": st.Page("components/options.py", title="Options Collections", icon=":material/ar_on_you:")
     }
     
     # Por defecto, todos los usuarios autenticados tienen acceso al chat
@@ -44,7 +45,8 @@ def get_authorized_pages(roles: List[str]) -> List[st.Page]:
             pages["collections"],
             pages["doc_gestion"],
             pages["parameters"],
-            pages["user_gestion"]
+            pages["user_gestion"],
+            pages["options"]
         ])
     
     return authorized_pages

@@ -64,3 +64,10 @@ class Parametro(Base):
     clave = Column(String, primary_key=True)
     valor = Column(String)
     tipo = Column(String)
+
+class Options(Base):
+    __tablename__ = "chat_options"
+    
+    option = Column(String, primary_key=True)
+    colleption = Column(String)
+    active = Column(Boolean)
