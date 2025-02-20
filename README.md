@@ -132,9 +132,7 @@ Necesitarás configurar las siguientes variables de entorno en un archivo .env:
 
 Sigue estos pasos para configurar el entorno y ejecutar la aplicación:
 
-1. Clona el repositorio:
-
-Clona el repositorio desde
+1. Clona el repositorio: Clona el repositorio desde
 
     ```bash
     git clone https://github.com/Jualoz-IA/Chatbot_Soporte.git
@@ -155,17 +153,13 @@ Clona el repositorio desde
     pip install -r requirements.txt
     ```
 
-4. Configurar la base de datos PostgreSQL
-
-Crea una base de datos en PostgreSQL y agrega las credenciales en el archivo .env.
+4. Configurar la base de datos PostgreSQL: Crea una base de datos en PostgreSQL y agrega las credenciales en el archivo .env.
 
     ```bash
     psql -U tu_usuario -d postgres -c "CREATE DATABASE chatbot_db;"
     ```
 
-5. Configurar las variables de entorno
-
-Crea un archivo .env en la raíz del proyecto con la siguiente estructura:
+5. Configurar las variables de entorno: Crea un archivo .env en la raíz del proyecto con la siguiente estructura.
 
     ```bash
 	GOOGLE_CLIENT_ID=TU_GOOGLE_CLIENT_ID
