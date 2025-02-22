@@ -40,9 +40,6 @@ class RAGAgent:
         # Asegurar que la pregunta está en UTF-8
         question = question.encode("utf-8", "ignore").decode("utf-8")
 
-        # Debug logging
-        st.write(f"Pregunta recibida para colección {collection}:", question)
-
         # Parsear el historial del chat asegurando UTF-8
         chat_history_parsed = [
             HumanMessage(content=msg['content'].encode("utf-8", "ignore").decode("utf-8"))
@@ -58,9 +55,6 @@ class RAGAgent:
             "question": question,
             "chat_history": chat_history_parsed
         })
-
-        # Debug de documentos recuperados
-        st.write("Documentos recuperados:", [doc.page_content for doc in response['source_documents']])
 
         return response
 

@@ -85,10 +85,13 @@ def doc_gestion():
                 # Process file based on type
                 if uploaded_file.name.endswith('.txt'):
                     process_txt(uploaded_file, collection_name)
+                    process_txt(uploaded_file, 'all_collection')
                 elif uploaded_file.name.endswith('.csv'):
                     process_csv(uploaded_file, collection_name)
+                    process_csv(uploaded_file, 'all_collection')
                 elif uploaded_file.name.endswith('.pdf'):
                     process_pdf(uploaded_file, collection_name)
+                    process_pdf(uploaded_file, 'all_collection')
 
                 st.success(f"Document successfully uploaded to collection: {collection_name}")
 
