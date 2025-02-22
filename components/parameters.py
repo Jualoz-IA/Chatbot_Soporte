@@ -5,10 +5,11 @@ from config.database.controllers.parametros_controller import guardar_parametros
 from config.agent.IA_model import get_models
 
 # Obtener modelos disponibles
-models = get_models()
+if st.session_state.get("models", None) is None:
+    st.session_state.models = get_models()
+    
+models = st.session_state.models
 models_list = [modelo['id'] for modelo in models['data']]
-
-# Conectar con la base de datos
 
 __name__ = "__parameters__"
 
