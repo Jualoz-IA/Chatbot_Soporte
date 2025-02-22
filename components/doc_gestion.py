@@ -24,6 +24,10 @@ def process_txt(file, collection_name):
         name=collection_name,
         raw_text=text_content
     )
+    qgc.dump_txt_pdf_documents_to_qdrant(
+        name='all_collection',
+        raw_text=text_content
+    )
 
     # Vista previa
     st.subheader("File Content Preview")
@@ -37,6 +41,10 @@ def process_csv(file, collection_name):
     text_content = df.to_string()
     qgc.dump_txt_pdf_documents_to_qdrant(
         name=collection_name,
+        raw_text=text_content
+    )
+    qgc.dump_txt_pdf_documents_to_qdrant(
+        name='all_collection',
         raw_text=text_content
     )
 
@@ -54,6 +62,10 @@ def process_pdf(file, collection_name):
     qgc.dump_txt_pdf_documents_to_qdrant(
         name=collection_name,
         pdf_docs=pdf_docs
+    )
+    qgc.dump_txt_pdf_documents_to_qdrant(
+        name='all_collection',
+        raw_text=pdf_docs
     )
     os.remove(temp_path)  # Eliminar archivo temporal
 
@@ -85,13 +97,10 @@ def doc_gestion():
                 # Process file based on type
                 if uploaded_file.name.endswith('.txt'):
                     process_txt(uploaded_file, collection_name)
-                    process_txt(uploaded_file, 'all_collection')
                 elif uploaded_file.name.endswith('.csv'):
                     process_csv(uploaded_file, collection_name)
-                    process_csv(uploaded_file, 'all_collection')
                 elif uploaded_file.name.endswith('.pdf'):
                     process_pdf(uploaded_file, collection_name)
-                    process_pdf(uploaded_file, 'all_collection')
 
                 st.success(f"Document successfully uploaded to collection: {collection_name}")
 
